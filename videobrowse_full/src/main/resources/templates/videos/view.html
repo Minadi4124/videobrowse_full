@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <title th:text="${video.title}">Video</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="/css/theme.css" rel="stylesheet"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="icon" href="data:,"/>
+  <style>
+    body {
+      background: linear-gradient(180deg, #0a0f1f, #0d1228) !important;
+      min-height: 100vh;
+      color: #ffffff !important;
+    }
+    
+    .watch-hero {
+      background: linear-gradient(135deg, rgba(0,229,255,.25), rgba(122,92,255,.25));
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+    
+    .watch-title {
+      color: #ffffff;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    .watch-meta {
+      color: #e6e9ef;
+      line-height: 1.6;
+    }
+    
+    .watch-card {
+      background: radial-gradient(1000px 400px at 0 -20%,rgba(0,229,255,.08),transparent),
+                  radial-gradient(1000px 400px at 100% 120%,rgba(122,92,255,.08),transparent),
+                  rgba(20,27,45,.85);
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow: 0 15px 50px rgba(0,0,0,.4);
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .watch-video {
+      width: 100%;
+      border-radius: 12px;
+      border: 2px solid rgba(255,255,255,.1);
+      box-shadow: 0 8px 25px rgba(0,0,0,.3);
+    }
+    
+    .details-card {
+      display: block;
+      position: relative;
+      background: linear-gradient(to bottom, #1e3a8a, #1e40af);
+      border-radius: 16px;
+      padding: 2em 1.5em;
+      text-decoration: none;
+      z-index: 0;
+      overflow: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+    
+    .details-card:before {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      top: -16px;
+      right: -16px;
+      background: linear-gradient(135deg, #6848ff, #00e5ff);
+      height: 32px;
+      width: 32px;
+      border-radius: 32px;
+      transform: scale(1);
+      transform-origin: 50% 50%;
+      transition: transform 0.35s ease-out;
+    }
+    
+    .details-card:hover:before {
+      transform: scale(28);
+    }
+    
+    .details-card:hover .detail-value {
+      transition: all 0.5s ease-out;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .details-card:hover .detail-label {
+      transition: all 0.5s ease-out;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .details-card:hover .card-title {
+      transition: all 0.5s ease-out;
+      color: #ffffff;
+    }
+    
+    .detail-item {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .detail-item:last-child {
+      border-bottom: none;
+    }
+    
+    .detail-label {
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+      transition: all 0.3s ease;
+    }
+    
+    .detail-value {
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+      word-break: break-all;
+      transition: all 0.3s ease;
+    }
+    
+    .detail-value.filename {
+      color: #ffffff;
+      background: linear-gradient(135deg, #6848ff, #00e5ff);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 15px rgba(104, 72, 255, 0.3);
+    }
+    
+    .badge-custom {
+      background: linear-gradient(135deg, #6848ff, #00e5ff);
+      color: white;
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .btn-back {
+      background: linear-gradient(135deg, #6848ff, #00e5ff);
+      border: none;
+      color: white;
+      border-radius: 25px;
+      padding: 8px 20px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-back:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(104, 72, 255, 0.4);
+      color: white;
+    }
+    
+    .upload-date {
+      color: rgba(255, 255, 255, 0.7);
+      font-style: italic;
+      font-size: 0.9rem;
+    }
+    
+    .category-badge {
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+      border-radius: 15px;
+      padding: 4px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .visibility-badge {
+      border-radius: 15px;
+      padding: 4px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .visibility-public {
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+    }
+    
+    .visibility-unlisted {
+      background: linear-gradient(135deg, #ffc107, #fd7e14);
+      color: white;
+    }
+    
+    .visibility-private {
+      background: linear-gradient(135deg, #6c757d, #495057);
+      color: white;
+    }
+    
+    /* Button Section Styling */
+    .button-section {
+      padding: 16px 0;
+    }
+    
+    .edit-btn {
+      background: linear-gradient(135deg, #007bff, #0056b3);
+      border: none;
+      color: white;
+      border-radius: 25px;
+      font-weight: 600;
+      padding: 12px 20px;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    }
+    
+    .edit-btn:hover {
+      background: linear-gradient(135deg, #0056b3, #003d82);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
+
+
+    }
+    
+    .delete-btn {
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      border: none;
+      color: white;
+      border-radius: 25px;
+      font-weight: 600;
+      padding: 12px 20px;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+      width: 100%;
+    }
+    
+    .delete-btn:hover {
+      background: linear-gradient(135deg, #c82333, #a71e2e);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
+    }
+    
+    .browse-btn {
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: rgba(255, 255, 255, 0.9);
+      border-radius: 25px;
+      font-weight: 600;
+      padding: 12px 20px;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .browse-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Button Container */
+    .d-grid.gap-2 {
+      gap: 16px !important;
+    }
+    
+    /* Comment Section Styling */
+    .comment-section {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .comment-form {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    
+    .comment-item {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .comment-author {
+      color: #00e5ff;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .comment-content {
+      color: rgba(255, 255, 255, 0.9);
+      margin: 8px 0;
+      line-height: 1.5;
+    }
+    
+    .comment-meta {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.8rem;
+    }
+    
+    .comment-actions {
+      margin-top: 12px;
+    }
+    
+    .comment-actions .btn {
+      padding: 4px 12px;
+      font-size: 0.8rem;
+      margin-right: 8px;
+    }
+    
+    .edit-form {
+      display: none;
+      margin-top: 12px;
+    }
+    
+    .edit-form.active {
+      display: block;
+    }
+    
+    /* Reaction Bar Styling */
+    .reaction-bar {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .reaction-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    
+    .reaction-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 25px;
+      padding: 12px 20px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .reaction-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+    }
+    
+    .reaction-btn.active {
+      background: linear-gradient(135deg, #6848ff, #00e5ff);
+      border-color: #6848ff;
+      color: white;
+      box-shadow: 0 4px 15px rgba(104, 72, 255, 0.3);
+    }
+    
+    .reaction-counts {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    
+    .reaction-count {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .reaction-count .count {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #00e5ff;
+    }
+    
+    .reaction-count .label {
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-4">
+    <div class="d-flex align-items-center mb-4">
+      <a href="/" class="btn btn-back btn-sm">
+        <i class="bi bi-arrow-left me-2"></i>
+        Back to Home
+      </a>
+      <h3 class="ms-3 mb-0 watch-title" th:text="${video.title}">Title</h3>
+    </div>
+
+    <div class="watch-card p-4">
+      <div class="row g-4">
+        <div class="col-12 col-lg-8">
+          <div class="watch-hero mb-3">
+            <video id="v" class="watch-video" controls preload="metadata">
+              <source th:src="@{'/files/videos/' + ${video.filename}}" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          
+          <div class="mb-3">
+            <h5 class="text-white mb-2">Description</h5>
+            <p class="watch-meta" th:text="${video.description ?: 'No description available.'}">Description</p>
+          </div>
+          
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <span class="category-badge" th:text="${video.category ?: 'Uncategorized'}">Category</span>
+            </div>
+            <div class="col-md-6">
+              <span th:class="${'visibility-badge ' + (video.visibility == 'PUBLIC' ? 'visibility-public' : (video.visibility == 'UNLISTED' ? 'visibility-unlisted' : 'visibility-private'))}"
+                    th:text="${video.visibility}">Visibility</span>
+            </div>
+          </div>
+          
+          <div th:if="${video.tags}" class="mb-3">
+            <h6 class="text-white mb-2">Tags</h6>
+            <div class="d-flex flex-wrap gap-2">
+              <span th:each="tag : ${#strings.arraySplit(video.tags, ',')}" 
+                    class="badge-custom" 
+                    th:text="${#strings.trim(tag)}">Tag</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-12 col-lg-4">
+          <div class="details-card h-100">
+            <div class="card-body">
+                             <h5 class="card-title mb-4" style="color: rgba(255, 255, 255, 0.95); font-weight: 700; font-size: 1.5em;">
+                 <i class="bi bi-info-circle me-2"></i>
+                 Video Details
+               </h5>
+              
+              <div class="detail-item">
+                <div class="detail-label">
+                  <i class="bi bi-file-earmark-video me-2"></i>
+                  Stored File
+                </div>
+                <div class="detail-value filename" th:text="${video.filename}">file.mp4</div>
+              </div>
+              
+              <div class="detail-item">
+                <div class="detail-label">
+                  <i class="bi bi-person me-2"></i>
+                  Uploaded By
+                </div>
+                <div class="detail-value" th:text="${video.uploader ?: 'Unknown'}">Uploader</div>
+              </div>
+              
+              <div class="detail-item">
+                <div class="detail-label">
+                  <i class="bi bi-calendar me-2"></i>
+                  Upload Date
+                </div>
+                <div class="detail-value upload-date" 
+                     th:text="${video.uploadedAt != null ? #temporals.format(video.uploadedAt, 'dd MMM yyyy, HH:mm') : 'Unknown'}">
+                  Date
+                </div>
+              </div>
+              
+              <div class="detail-item">
+                <div class="detail-label">
+                  <i class="bi bi-hash me-2"></i>
+                  Video ID
+                </div>
+                <div class="detail-value" th:text="${video.id}">ID</div>
+              </div>
+              
+              <div class="detail-item">
+                <div class="detail-label">
+                  <i class="bi bi-eye me-2"></i>
+                  Visibility
+                </div>
+                <div class="detail-value">
+                  <span th:class="${'visibility-badge ' + (video.visibility == 'PUBLIC' ? 'visibility-public' : (video.visibility == 'UNLISTED' ? 'visibility-unlisted' : 'visibility-private'))}"
+                        th:text="${video.visibility}">Visibility</span>
+                </div>
+              </div>
+              
+              <div class="detail-item" th:if="${video.category}">
+                <div class="detail-label">
+                  <i class="bi bi-tags me-2"></i>
+                  Category
+                </div>
+                <div class="detail-value">
+                  <span class="category-badge" th:text="${video.category}">Category</span>
+                </div>
+              </div>
+              
+              <div class="mt-4 button-section">
+                <div class="d-grid gap-2">
+                  <div th:if="${canManage}">
+                    <a th:href="@{'/videos/' + ${video.id} + '/edit'}" class="btn btn-primary edit-btn w-100">
+                      <i class="bi bi-pencil-square me-2"></i>
+                      Edit Video
+                    </a>
+                    <form th:action="@{'/videos/' + ${video.id} + '/delete'}" method="post" class="d-grid mt-2">
+                      <button class="btn btn-danger delete-btn"
+                              onclick="return confirm('Are you sure you want to delete this video? This action cannot be undone.')">
+                        <i class="bi bi-trash me-2"></i>
+                        Delete Video
+                      </button>
+                    </form>
+                  </div>
+                  <a href="/browse" class="btn btn-outline-light browse-btn">
+                    <i class="bi bi-collection me-2"></i>
+                    Browse More Videos
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Reaction Bar -->
+    <div class="reaction-bar">
+      <h4 class="text-white mb-4 text-center">
+        <i class="bi bi-emoji-smile me-2"></i>
+        React to this Video
+      </h4>
+      
+      <div class="reaction-buttons">
+        <form th:action="@{'/videos/' + ${video.id} + '/reactions'}" method="post" class="d-inline">
+          <input type="hidden" name="type" value="HEART"/>
+          <button type="submit" class="reaction-btn">
+            <i class="bi bi-heart-fill"></i>
+            Heart
+          </button>
+        </form>
+        
+        <form th:action="@{'/videos/' + ${video.id} + '/reactions'}" method="post" class="d-inline">
+          <input type="hidden" name="type" value="THUMBS_UP"/>
+          <button type="submit" class="reaction-btn">
+            <i class="bi bi-hand-thumbs-up-fill"></i>
+            Thumbs Up
+          </button>
+        </form>
+        
+        <form th:action="@{'/videos/' + ${video.id} + '/reactions'}" method="post" class="d-inline">
+          <input type="hidden" name="type" value="HAPPY"/>
+          <button type="submit" class="reaction-btn">
+            <i class="bi bi-emoji-smile-fill"></i>
+            Happy
+          </button>
+        </form>
+        
+        <form th:action="@{'/videos/' + ${video.id} + '/reactions'}" method="post" class="d-inline">
+          <input type="hidden" name="type" value="SAD"/>
+          <button type="submit" class="reaction-btn">
+            <i class="bi bi-emoji-frown-fill"></i>
+            Sad
+          </button>
+        </form>
+        
+        <form th:action="@{'/videos/' + ${video.id} + '/reactions/remove'}" method="post" class="d-inline">
+          <button type="submit" class="reaction-btn" style="background: rgba(220, 53, 69, 0.2); border-color: rgba(220, 53, 69, 0.4);">
+            <i class="bi bi-x-circle"></i>
+            Remove Reaction
+          </button>
+        </form>
+      </div>
+      
+      <div class="reaction-counts">
+        <div class="reaction-count">
+          <div class="count" th:text="${reactionCounts['HEART']}">0</div>
+          <div class="label">❤️ Hearts</div>
+        </div>
+        <div class="reaction-count">
+          <div class="count" th:text="${reactionCounts['THUMBS_UP']}">0</div>
+          <div class="label">👍 Thumbs Up</div>
+        </div>
+        <div class="reaction-count">
+          <div class="count" th:text="${reactionCounts['HAPPY']}">0</div>
+          <div class="label">😊 Happy</div>
+        </div>
+        <div class="reaction-count">
+          <div class="count" th:text="${reactionCounts['SAD']}">0</div>
+          <div class="label">😢 Sad</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Comments Section -->
+    <div class="comment-section">
+      <h4 class="text-white mb-4">
+        <i class="bi bi-chat-dots me-2"></i>
+        Comments (<span th:text="${#lists.size(comments)}">0</span>)
+      </h4>
+      
+      <!-- Add Comment Form -->
+      <div class="comment-form">
+        <form th:action="@{'/videos/' + ${video.id} + '/comments'}" method="post">
+          <div class="mb-3">
+            <label class="form-label text-white">Add a Comment</label>
+            <textarea name="content" class="form-control" rows="3" 
+                      placeholder="Share your thoughts about this video..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-send me-2"></i>
+            Post Comment
+          </button>
+        </form>
+      </div>
+      
+      <!-- Comments List -->
+      <div th:if="${#lists.isEmpty(comments)}" class="text-center text-muted py-4">
+        <i class="bi bi-chat-dots" style="font-size: 2rem;"></i>
+        <p class="mt-2">No comments yet. Be the first to comment!</p>
+      </div>
+      
+      <div th:each="comment : ${comments}" class="comment-item">
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="comment-author" th:text="${comment.author}">Author</div>
+          <div class="comment-meta">
+            <span th:text="${#temporals.format(comment.createdAt, 'MMM dd, yyyy HH:mm')}">Date</span>
+            <span th:if="${comment.updatedAt != null}" class="ms-2 text-muted">
+              (edited <span th:text="${#temporals.format(comment.updatedAt, 'MMM dd, yyyy HH:mm')}">Date</span>)
+            </span>
+          </div>
+        </div>
+        
+        <div class="comment-content" th:text="${comment.content}">Comment content</div>
+        
+        <div class="comment-actions">
+          <button class="btn btn-sm btn-outline-primary" 
+                  th:onclick="'toggleEdit(' + ${comment.id} + ')'">
+            <i class="bi bi-pencil me-1"></i>
+            Edit
+          </button>
+          <form th:action="@{'/videos/' + ${video.id} + '/comments/' + ${comment.id} + '/delete'}" 
+                method="post" class="d-inline">
+            <button type="submit" class="btn btn-sm btn-outline-danger"
+                    onclick="return confirm('Are you sure you want to delete this comment?')">
+              <i class="bi bi-trash me-1"></i>
+              Delete
+            </button>
+          </form>
+        </div>
+        
+        <!-- Edit Form -->
+        <div th:id="'edit-form-' + ${comment.id}" class="edit-form">
+          <form th:action="@{'/videos/' + ${video.id} + '/comments/' + ${comment.id} + '/edit'}" method="post">
+            <div class="mb-2">
+              <textarea name="content" class="form-control" rows="2" 
+                        th:text="${comment.content}" required></textarea>
+            </div>
+            <div>
+              <button type="submit" class="btn btn-sm btn-success me-2">
+                <i class="bi bi-check me-1"></i>
+                Save
+              </button>
+              <button type="button" class="btn btn-sm btn-secondary" 
+                      th:onclick="'toggleEdit(' + ${comment.id} + ')'">
+                <i class="bi bi-x me-1"></i>
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+let sid = null;
+const videoId = [[${video.id}]];
+fetch('/api/playback/start/' + videoId, {method:'POST'})
+  .then(r=>r.json()).then(j=>{ sid = j.id; });
+const v = document.getElementById('v');
+v.addEventListener('timeupdate', ()=>{
+  if(!sid) return;
+  fetch('/api/playback/'+sid+'/progress?seconds='+Math.floor(v.currentTime), {method:'POST'});
+});
+/*]]>*/
+</script>
+<script>
+function toggleEdit(commentId) {
+  const editForm = document.getElementById('edit-form-' + commentId);
+  if (editForm) {
+    editForm.classList.toggle('active');
+  }
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

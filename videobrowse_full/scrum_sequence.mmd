@@ -1,0 +1,45 @@
+sequenceDiagram
+  autonumber
+  participant PO as Product Owner
+  participant SM as Scrum Master
+  participant DEV as Developers
+  participant STK as Stakeholders
+
+  PO->>PO: Maintain Product Backlog
+  PO->>PO: Refine & Prioritize Items
+
+  SM->>PO: Facilitate Sprint Planning
+  SM->>DEV: Facilitate Sprint Planning
+  PO-->>DEV: Present Goals & Prioritized Items
+  DEV->>DEV: Estimate & Select Items
+  DEV->>DEV: Create Sprint Backlog
+
+  loop Daily Scrum (Each Day)
+    SM->>DEV: Facilitate Daily Scrum
+    DEV->>DEV: Plan Daily Work & Identify Impediments
+    SM->>SM: Remove Impediments
+  end
+
+  par Implementation & Quality
+    DEV->>DEV: Implement User Stories
+    DEV->>DEV: Unit & Integration Testing
+    DEV->>DEV: Code Review
+  and Definition of Done
+    DEV->>DEV: Verify Definition of Done
+  end
+
+  DEV->>SM: Demo Increment
+  SM->>STK: Facilitate Sprint Review
+  STK-->>PO: Provide Feedback
+  PO->>PO: Update Product Backlog
+
+  SM->>DEV: Facilitate Retrospective
+  DEV->>DEV: Identify Improvements
+  SM->>SM: Plan Process Improvements
+
+  alt Release decision
+    DEV->>PO: Propose Release
+    PO-->>STK: Communicate Release Plan
+  else Defer release
+    DEV->>SM: Continue with Next Sprint Planning
+  end

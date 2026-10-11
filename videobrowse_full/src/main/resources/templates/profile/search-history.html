@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Search History</title>
+</head>
+<body>
+<h1>Search History</h1>
+<form method="post" th:action="@{/profile/search-history/clear}">
+    <button type="submit">Clear</button>
+    <a th:href="@{/profile}">Back</a>
+    </form>
+<table border="1" cellpadding="4">
+    <thead>
+    <tr>
+        <th>Searched At</th>
+        <th>Query</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="it : ${items}">
+        <td th:text="${#temporals.format(it.searchedAt, 'yyyy-MM-dd HH:mm')}"></td>
+        <td th:text="${it.query}"></td>
+    </tr>
+    </tbody>
+    </table>
+</body>
+</html>
+
+

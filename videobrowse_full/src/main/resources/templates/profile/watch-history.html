@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Watch History</title>
+</head>
+<body>
+<h1>Watch History</h1>
+<form method="post" th:action="@{/profile/watch-history/clear}">
+    <button type="submit">Clear</button>
+    <a th:href="@{/profile}">Back</a>
+</form>
+<table border="1" cellpadding="4">
+    <thead>
+    <tr>
+        <th>Watched At</th>
+        <th>Video</th>
+        <th>Seconds</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="it : ${items}">
+        <td th:text="${#temporals.format(it.watchedAt, 'yyyy-MM-dd HH:mm')}"></td>
+        <td th:text="${it.video.title}"></td>
+        <td th:text="${it.watchedSeconds}"></td>
+    </tr>
+    </tbody>
+    </table>
+</body>
+</html>
+
+

@@ -1,0 +1,81 @@
+flowchart LR
+  %% UML-like Activity Diagram for Scrum Workflow using Mermaid Flowchart
+  %% Swimlanes represented via subgraphs
+
+  %% Start and End
+  START([Start])
+  END([End])
+
+  %% Product Owner lane
+  subgraph L1["Product Owner"]
+    PO_Backlog["Maintain Product Backlog"]
+    PO_Refinement["Backlog Refinement"]
+    PO_Prioritize["Prioritize Backlog Items"]
+  end
+
+  %% Scrum Master lane
+  subgraph L2["Scrum Master"]
+    SM_FacilitatePlanning["Facilitate Sprint Planning"]
+    SM_FacilitateDaily["Facilitate Daily Scrum"]
+    SM_RemoveImpediments["Remove Impediments"]
+    SM_FacilitateReview["Facilitate Sprint Review"]
+    SM_FacilitateRetro["Facilitate Retrospective"]
+  end
+
+  %% Developers lane
+  subgraph L3["Developers"]
+    DEV_SprintPlanning["Estimate & Select Items (Sprint Planning)"]
+    DEV_SprintBacklog["Create/Update Sprint Backlog"]
+    DEV_Implement["Implement User Stories"]
+    DEV_UnitTest["Unit & Integration Testing"]
+    DEV_CodeReview["Peer Code Review"]
+    DEV_DefinitionOfDone{"Meets Definition of Done?"}
+    DEV_Fix["Fix Issues"]
+    DEV_Increment["Potentially Shippable Increment"]
+    DEV_ReleaseDecision{"Release Now?"}
+  end
+
+  %% Stakeholders lane
+  subgraph L4["Stakeholders"]
+    STK_Feedback["Provide Feedback"]
+  end
+
+  %% Backlog artifacts
+  subgraph A1["Artifacts"]
+    ART_ProductBacklog[("Product Backlog")]
+    ART_SprintBacklog[("Sprint Backlog")]
+    ART_Increment[("Increment")]
+  end
+
+  %% Flow
+  START --> PO_Backlog --> PO_Refinement --> PO_Prioritize --> ART_ProductBacklog
+
+  ART_ProductBacklog --> SM_FacilitatePlanning
+  SM_FacilitatePlanning --> DEV_SprintPlanning --> DEV_SprintBacklog --> ART_SprintBacklog
+
+  %% Sprint loop
+  ART_SprintBacklog --> SM_FacilitateDaily --> DEV_Implement --> DEV_UnitTest --> DEV_CodeReview --> DEV_DefinitionOfDone
+
+  DEV_DefinitionOfDone --|No|--> DEV_Fix --> DEV_DefinitionOfDone
+  DEV_DefinitionOfDone --|Yes|--> DEV_Increment --> ART_Increment
+
+  %% Review & feedback
+  ART_Increment --> SM_FacilitateReview --> STK_Feedback --> PO_Refinement
+
+  %% Retrospective and improvement
+  SM_FacilitateReview --> SM_FacilitateRetro --> SM_RemoveImpediments
+
+  %% Release decision
+  ART_Increment --> DEV_ReleaseDecision
+  DEV_ReleaseDecision --|Yes|--> END
+  DEV_ReleaseDecision --|No|--> SM_FacilitatePlanning
+
+  %% Styling
+  classDef lane fill:#f8f8f8,stroke:#bbb,stroke-width:1px
+  class L1,L2,L3,L4 lane
+
+  classDef artifact fill:#eef7ff,stroke:#4a90e2,stroke-width:1px
+  class ART_ProductBacklog,ART_SprintBacklog,ART_Increment artifact
+
+  classDef decision fill:#fff7e6,stroke:#f5a623,stroke-width:1px
+  class DEV_DefinitionOfDone,DEV_ReleaseDecision decision

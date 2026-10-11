@@ -1,0 +1,91 @@
+erDiagram
+  USERS {
+    BIGINT id PK
+    VARCHAR username "unique"
+    VARCHAR email "unique"
+    VARCHAR password
+    BOOLEAN enabled
+  }
+
+  ROLES {
+    BIGINT id PK
+    VARCHAR name "unique"
+  }
+
+  USER_ROLES {
+    BIGINT user_id FK
+    BIGINT role_id FK
+  }
+
+  USER_PROFILES {
+    BIGINT id PK
+    BIGINT user_id "unique FK"
+    VARCHAR display_name
+    TEXT preferences_json
+    DATETIME created_at
+    DATETIME updated_at
+  }
+
+  CATEGORIES {
+    BIGINT id PK
+    VARCHAR name "unique"
+    VARCHAR description
+    VARCHAR category_type
+  }
+
+  TAGS {
+    BIGINT id PK
+    VARCHAR name "unique"
+  }
+
+  VIDEOS {
+    BIGINT id PK
+    VARCHAR title
+    VARCHAR description
+    VARCHAR filename
+    VARCHAR thumbnail
+    VARCHAR format
+    INT duration_seconds
+    VARCHAR category
+    VARCHAR uploader
+    DATETIME uploaded_at
+    VARCHAR tags
+    ENUM visibility "PUBLIC|PRIVATE|UNLISTED"
+    BIGINT category_ref_id FK
+    VARCHAR video_type
+  }
+
+  VIDEO_TAGS {
+    BIGINT video_id FK
+    BIGINT tag_id FK
+  }
+
+  WATCH_HISTORY {
+    BIGINT id PK
+    BIGINT user_id FK
+    BIGINT video_id FK
+    DATETIME watched_at
+    BIGINT watched_seconds
+  }
+
+  SEARCH_HISTORY {
+    BIGINT id PK
+    BIGINT user_id FK
+    VARCHAR query
+    DATETIME searched_at
+  }
+
+  USERS ||--o{ USER_ROLES : has
+  ROLES ||--o{ USER_ROLES : grants
+
+  USERS ||--|| USER_PROFILES : owns
+
+  CATEGORIES ||--o{ VIDEOS : classifies
+
+  VIDEOS ||--o{ VIDEO_TAGS : links
+  TAGS   ||--o{ VIDEO_TAGS : links
+
+  USERS ||--o{ WATCH_HISTORY : creates
+  VIDEOS ||--o{ WATCH_HISTORY : watched
+
+  USERS ||--o{ SEARCH_HISTORY : performs

@@ -1,0 +1,107 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="utf-8"/><title>Submit Support Ticket</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="/css/theme.css" rel="stylesheet"/>
+<style>
+  .form-control::placeholder { color:#000000 !important; }
+  .form-select option { color:#000000; }
+  .form-control, .form-select { 
+    background-color: rgba(255,255,255,0.9) !important; 
+    color:#000000 !important; 
+  }
+  .form-control:focus, .form-select:focus {
+    color:#000000 !important;
+  }
+</style></head>
+<body class="container mt-4" style="max-width:720px;">
+  <div class="d-flex align-items-center mb-3">
+    <h3 class="mb-0">Submit a Support Ticket</h3>
+    <a href="/" class="btn btn-sm btn-outline-secondary ms-auto">Back to Home</a>
+  </div>
+  
+  <div class="alert alert-info">
+    <strong>Need Help?</strong> Submit a support ticket and our team will assist you. Please provide detailed information to help us resolve your issue quickly.
+  </div>
+  
+  <div class="card">
+    <div class="card-body">
+      <form method="post" id="supportForm" novalidate>
+        <div class="mb-3">
+          <label class="form-label">Your Email <span class="text-danger">*</span></label>
+          <input name="email" id="email" class="form-control" type="email" required placeholder="Enter your email address"/>
+          <div class="invalid-feedback d-none" id="emailError">Please enter a valid email address (e.g., name1234@gmail.com)</div>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Ticket Type</label>
+          <select class="form-select" name="type">
+            <option value="GEN">General Inquiry</option>
+            <option value="TECH">Technical Support</option>
+          </select>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Topic / Affected Feature</label>
+          <input name="extra" class="form-control" placeholder="e.g., Video upload, Login issues, etc."/>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Message <span class="text-danger">*</span></label>
+          <textarea name="message" class="form-control" rows="5" required placeholder="Describe your issue or question in detail..."></textarea>
+        </div>
+        
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary" type="submit">
+            <i class="bi bi-send"></i> Send Ticket
+          </button>
+          <a href="/" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const emailInput = document.getElementById('email');
+  const form = document.getElementById('supportForm');
+  
+  // Email validation function
+  function validateEmail() {
+    const email = emailInput.value.trim();
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const isValid = emailRegex.test(email);
+    
+    if (isValid) {
+      emailInput.classList.remove('is-invalid');
+      emailInput.classList.add('is-valid');
+      document.getElementById('emailError').classList.add('d-none');
+    } else {
+      emailInput.classList.remove('is-valid');
+      emailInput.classList.add('is-invalid');
+      document.getElementById('emailError').classList.remove('d-none');
+    }
+    return isValid;
+  }
+  
+  // Real-time validation on input
+  emailInput.addEventListener('input', validateEmail);
+  emailInput.addEventListener('blur', validateEmail);
+  
+  // Form submission validation
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const isEmailValid = validateEmail();
+    
+    if (isEmailValid) {
+      // All validations passed, submit the form
+      form.submit();
+    } else {
+      // Show error message
+      document.getElementById('emailError').textContent = 'Please enter a valid email address (e.g., name1234@gmail.com)';
+    }
+  });
+});
+</script>
+</html>

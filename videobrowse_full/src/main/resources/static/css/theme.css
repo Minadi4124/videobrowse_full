@@ -1,0 +1,63 @@
+/* SLIITFLIX Neon Theme */
+:root{
+  --bg:#0a0f1f;--bg2:#0d1228;--card:#141b2d;--muted:#a6b0c2;--neon:#00e5ff;--neon2:#7a5cff;--accent:#22ffd0;
+}
+html,body{background:linear-gradient(180deg,var(--bg),var(--bg2));color:#ffffff;min-height:100%;}
+body.container{background:linear-gradient(180deg,var(--bg),var(--bg2)) !important;color:#ffffff !important}
+/* Force white text across the site for readability on neon backgrounds */
+body, p, a, span, label, li, th, td, small, strong, em, .nav-link, .btn-link { color:#ffffff !important; }
+.navbar .nav-link, .navbar .navbar-brand { color:#ffffff !important; }
+.text-muted{ color:#a6b0c2 !important; }
+.navbar-dark{background:linear-gradient(90deg,rgba(10,15,35,.85),rgba(15,20,45,.85))!important;backdrop-filter:blur(6px);} 
+.navbar-brand{font-weight:700;letter-spacing:.5px;color:#ffffff!important}
+h1,h2,h3,h4{font-weight:800;letter-spacing:1px;color: #ffffff;text-shadow:0 0 18px rgba(0,229,255,.25),0 0 28px rgba(122,92,255,.2)}
+h1 .fx, h2 .fx{color:var(--neon2)}
+.btn-primary{background:linear-gradient(90deg,var(--neon),var(--neon2));border:0;box-shadow:0 0 20px rgba(0,229,255,.35)}
+.btn-outline-light,.btn-outline-secondary{border-color:rgba(255,255,255,.35);color:#e6e9ef}
+.card{background:radial-gradient(1000px 400px at 0 -20%,rgba(0,229,255,.08),transparent),radial-gradient(1000px 400px at 100% 120%,rgba(122,92,255,.08),transparent),var(--card);border:1px solid rgba(255,255,255,.06);box-shadow:0 10px 40px rgba(0,0,0,.35)}
+.table{color:#ffffff !important;background-color:rgba(20,27,45,.5) !important}
+.table thead th{background-color:#0d1228 !important;color:#ffffff !important;border-bottom:1px solid rgba(255,255,255,.12);border-top:1px solid rgba(255,255,255,.12);border-color:rgba(255,255,255,.12) !important}
+.table tbody td{background-color:rgba(20,27,45,.3) !important;color:#ffffff !important;border-color:rgba(255,255,255,.12) !important}
+.table tbody tr:hover td{background-color:rgba(30,37,55,.5) !important}
+.table-bordered{border:1px solid rgba(255,255,255,.12) !important}
+.table-bordered td,.table-bordered th{border:1px solid rgba(255,255,255,.12) !important}
+.table-bordered thead th{border-bottom:1px solid rgba(255,255,255,.25) !important}
+.form-control,.form-select,textarea{background:#1a1a2e;color:#ffffff;border:1px solid rgba(255,255,255,.25)}
+.form-control:focus,.form-select:focus,textarea:focus{background:#1a1a2e;color:#ffffff;border:1px solid rgba(0,229,255,.5);box-shadow:0 0 10px rgba(0,229,255,.2)}
+::placeholder{ color:#a6b0c2; opacity:0.8; }
+.form-control::placeholder{ color:#a6b0c2 !important; opacity:0.8; }
+.alert-info,.alert-secondary{background:rgba(255,255,255,.06);color:#bcd3ff;border:1px solid rgba(255,255,255,.12)}
+.bg-light{background:linear-gradient(180deg,var(--bg),var(--bg2))!important}
+.ratio-16x9.bg-secondary{background:linear-gradient(135deg,rgba(0,229,255,.18),rgba(122,92,255,.18))!important;border:1px solid rgba(255,255,255,.08)}
+.section{padding:48px 0}
+.neon-divider{height:1px;background:linear-gradient(90deg,transparent,var(--neon),transparent);opacity:.6;margin:24px 0}
+footer{color:#ffffff}
+
+/* Links & text */
+a, .nav-link{color:#ffffff}
+a:hover, .nav-link:hover{color:#e6e9ef}
+.card .card-title,.card .card-text{color:#ffffff}
+
+/* Landing page: make only the "Browse Videos" button text black */
+.btn-browse-black{ color:#000000 !important; }
+
+/* Additional fixes for consistency */
+.card-title, .card-text { color: #ffffff !important; }
+.form-label { color: #ffffff !important; font-weight: 600; }
+.text-primary { color: var(--neon) !important; }
+.text-secondary { color: var(--muted) !important; }
+
+/* Fix for upload page text visibility */
+.upload-card .form-label,
+.upload-card .card-title,
+.upload-card .form-text {
+  color: #ffffff !important;
+}
+
+/* Ensure consistent button styling */
+.btn-outline-light:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+}
+

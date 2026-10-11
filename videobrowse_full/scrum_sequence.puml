@@ -1,0 +1,64 @@
+@startuml
+' UML Sequence Diagram: Agile Scrum Workflow
+' Participants
+actor "Product Owner" as PO
+participant "Scrum Master" as SM
+participant "Developers" as DEV
+actor "Stakeholders" as STK
+
+== Backlog Management ==
+PO -> PO: Maintain Product Backlog
+PO -> PO: Refine & Prioritize Items
+
+== Sprint Planning ==
+SM -> PO: Facilitate Sprint Planning
+SM -> DEV: Facilitate Sprint Planning
+PO --> DEV: Present Product Goal & Top PBIs
+DEV -> DEV: Estimate PBIs
+DEV -> DEV: Select PBIs for Sprint Goal
+DEV -> DEV: Create Sprint Backlog
+
+== Sprint Execution ==
+loop Daily Scrum (every day)
+  SM -> DEV: Facilitate Daily Scrum
+  DEV -> DEV: Plan daily work
+  DEV -> SM: Raise impediments
+  SM -> SM: Remove impediments
+end
+
+par Development
+  DEV -> DEV: Implement User Stories
+  DEV -> DEV: Unit & Integration Tests
+else Code Review
+  DEV -> DEV: Peer Code Review
+end
+
+alt Meets Definition of Done?
+  DEV -> DEV: Verify DoD
+  note right of DEV
+    Done = Coded, Tested, Reviewed,
+    Integrated, Documented as agreed
+  end note
+else Rework
+  DEV -> DEV: Fix Issues and Retest
+end
+
+== Review ==
+DEV -> SM: Demonstrate Increment
+SM -> STK: Facilitate Sprint Review
+STK --> PO: Provide Feedback
+PO -> PO: Update & Reorder Product Backlog
+
+== Retrospective ==
+SM -> DEV: Facilitate Retrospective
+DEV -> DEV: Identify Improvements
+SM -> SM: Plan Process Improvements
+
+alt Release Now?
+  DEV -> PO: Propose Release
+  PO --> STK: Communicate Release Plan
+else Defer Release
+  DEV -> SM: Feed into Next Sprint Planning
+end
+
+@enduml

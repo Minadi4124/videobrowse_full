@@ -1,0 +1,553 @@
+﻿<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;line-height:1.6;margin:40px;color:#333}h1,h2,h3{color:#2c3e50}code{background:#f4f4f4;padding:2px 4px;border-radius:3px}pre{background:#f4f4f4;padding:15px;border-radius:5px;overflow-x:auto}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background-color:#f2f2f2}</style></head><body># VideoBrowse System - Complete Technical Documentation
+
+## 🎯 Project Overview
+
+<strong>Project Name:</strong> VideoBrowse System (SLIITFLIX)  
+<strong>Technology Stack:</strong> Spring Boot 3.2.6, Java 17, Maven, H2/MySQL, Thymeleaf, Bootstrap  
+<strong>Architecture:</strong> MVC (Model-View-Controller) with Spring Security  
+<strong>Purpose:</strong> A full-featured video streaming platform with user management, content management, and administrative capabilities
+
+---
+
+## 🏗️ Spring Boot Architecture Components
+
+### 1. <strong>Controllers</strong> - The Traffic Directors
+<strong>What are Controllers?</strong>
+Controllers are the entry points of your application. They handle HTTP requests from users and coordinate between the frontend and backend services.
+
+<strong>How they work:</strong>
+- Receive HTTP requests (GET, POST, PUT, DELETE)
+- Validate input data
+- Call appropriate services
+- Return responses (HTML pages, JSON data, redirects)
+
+<strong>Example in our project:</strong>
+<pre><code class="language-java">
+@Controller
+@RequestMapping("/videos")
+public class VideoController {
+    @GetMapping("/upload")
+    public String uploadForm() {
+        return "videos/upload"; // Returns HTML template
+    }
+    
+    @PostMapping("/upload")
+    public String uploadVideo(@ModelAttribute VideoUploadRequest request) {
+        videoService.uploadVideo(request); // Calls service
+        return "redirect:/videos"; // Redirects user
+    }
+}
+</code></pre>
+
+### 2. <strong>Entities</strong> - The Data Models
+<strong>What are Entities?</strong>
+Entities represent database tables as Java objects. They define the structure of your data and relationships between different data types.
+
+<strong>Key Features:</strong>
+- Map to database tables
+- Define relationships (One-to-Many, Many-to-One)
+- Include validation annotations
+- Handle data persistence
+
+<strong>Example in our project:</strong>
+<pre><code class="language-java">
+@Entity
+@Table(name = "users")
+public class User {
+    @Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(unique = true, nullable = false)
+    private String username;
+    
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private UserProfile profile;
+    
+    // Getters and setters
+}
+</code></pre>
+
+### 3. <strong>Repositories</strong> - The Data Access Layer
+<strong>What are Repositories?</strong>
+Repositories handle all database operations. They provide methods to save, find, update, and delete data without writing SQL queries.
+
+<strong>Types in our project:</strong>
+- <strong>JpaRepository:</strong> Provides basic CRUD operations
+- <strong>Custom Queries:</strong> For complex database operations
+
+<strong>Example:</strong>
+<pre><code class="language-java">
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByUsername(String username);
+    List<User> findByRolesContaining(Role role);
+}
+</code></pre>
+
+### 4. <strong>Services</strong> - The Business Logic
+<strong>What are Services?</strong>
+Services contain the business logic of your application. They process data, implement business rules, and coordinate between different components.
+
+<strong>Responsibilities:</strong>
+- Business logic implementation
+- Data validation
+- Transaction management
+- Integration with multiple repositories
+
+<strong>Example:</strong>
+<pre><code class="language-java">
+@Service
+@Transactional
+public class UserService {
+    @Autowired
+    private UserRepository userRepository;
+    
+    public User registerUser(String username, String email, String password) {
+        // Business logic: validate, encrypt password, save user
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode(password));
+        return userRepository.save(user);
+    }
+}
+</code></pre>
+
+### 5. <strong>Security</strong> - The Protection Layer
+<strong>What is Spring Security?</strong>
+Spring Security handles authentication (who you are) and authorization (what you can do) in your application.
+
+<strong>Components:</strong>
+- <strong>Authentication:</strong> Login/logout functionality
+- <strong>Authorization:</strong> Role-based access control
+- <strong>Password Encryption:</strong> BCrypt hashing
+- <strong>Session Management:</strong> User sessions and remember-me
+
+<strong>Example:</strong>
+<pre><code class="language-java">
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) {
+        return http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/admin/<em></em>").hasRole("ADMIN")
+                .requestMatchers("/profile/<em></em>").authenticated()
+                .anyRequest().permitAll()
+            )
+            .formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/")
+            )
+            .build();
+    }
+}
+</code></pre>
+
+---
+
+## 🔄 How Components Work Together
+
+### Request Flow:
+1. <strong>User</strong> makes HTTP request → <strong>Controller</strong>
+2. <strong>Controller</strong> validates input → <strong>Service</strong>
+3. <strong>Service</strong> processes business logic → <strong>Repository</strong>
+4. <strong>Repository</strong> interacts with <strong>Database</strong>
+5. <strong>Response</strong> flows back through the same chain
+
+### Example Flow (User Registration):
+</code></pre>
+User fills form → AuthController.register() → UserService.registerUser() 
+→ UserRepository.save() → Database → Success response → Redirect to login
+</code></pre>
+
+---
+
+## 📁 Project Structure Analysis
+
+### <strong>pom.xml</strong> - The Project Configuration
+<strong>What does pom.xml do?</strong>
+The Project Object Model (POM) file defines your project's dependencies, build configuration, and metadata.
+
+<strong>Key Sections:</strong>
+<pre><code class="language-xml">
+<parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.2.6</version>
+</parent>
+
+<dependencies>
+    <!-- Web framework -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    
+    <!-- Database -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    
+    <!-- Security -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+</dependencies>
+</code></pre>
+
+<strong>What each dependency does:</strong>
+- <strong>spring-boot-starter-web:</strong> Provides web server and REST capabilities
+- <strong>spring-boot-starter-data-jpa:</strong> Database operations and ORM
+- <strong>spring-boot-starter-security:</strong> Authentication and authorization
+- <strong>spring-boot-starter-thymeleaf:</strong> Template engine for HTML pages
+- <strong>h2:</strong> Embedded database for development
+- <strong>mysql-connector-java:</strong> MySQL database driver
+
+---
+
+## 🗄️ Database Configuration
+
+### <strong>application.properties</strong> - The Configuration File
+<pre><code class="language-properties">
+# Application settings
+spring.application.name=SLIITFLIX
+server.port=8080
+
+# H2 Database (Default)
+spring.datasource.url=jdbc:h2:file:./data/h2db/videobrowse
+spring.datasource.username=sa
+spring.datasource.password=
+
+# JPA/Hibernate settings
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+# File upload settings
+spring.servlet.multipart.max-file-size=2GB
+spring.servlet.multipart.max-request-size=2GB
+</code></pre>
+
+<strong>What each setting does:</strong>
+- <strong>ddl-auto=update:</strong> Automatically creates/updates database tables
+- <strong>show-sql=true:</strong> Displays SQL queries in console (for debugging)
+- <strong>max-file-size=2GB:</strong> Allows large video file uploads
+
+---
+
+## 📂 File-by-File Analysis
+
+### <strong>Java Files:</strong>
+
+#### 1. <strong>VideoBrowseApplication.java</strong> - The Main Class
+<pre><code class="language-java">
+@SpringBootApplication
+public class VideoBrowseApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(VideoBrowseApplication.class, args);
+    }
+    
+    @Bean
+    @EventListener(ApplicationReadyEvent.class)
+    public void seedData() {
+        // Creates default admin and user accounts
+        userService.register("admin", "admin@example.com", "adminpass", true);
+        userService.register("user", "user@example.com", "userpass", false);
+    }
+}
+</code></pre>
+<strong>Purpose:</strong> Application entry point and initial data seeding
+
+#### 2. <strong>User.java</strong> - User Entity
+<pre><code class="language-java">
+@Entity
+@Table(name = "users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(unique = true, nullable = false)
+    private String username;
+    
+    @Column(nullable = false)
+    private String email;
+    
+    @Column(nullable = false)
+    private String password;
+    
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    private Set<Role> roles = new HashSet<>();
+    
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private UserProfile profile;
+}
+</code></pre>
+<strong>Purpose:</strong> Defines user data structure and database mapping
+
+#### 3. <strong>UserController.java</strong> - User Management Controller
+<pre><code class="language-java">
+@Controller
+@RequestMapping("/profile")
+public class ProfileController {
+    @GetMapping("/view")
+    public String viewProfile(Model model, Authentication auth) {
+        User user = userService.findByUsername(auth.getName());
+        model.addAttribute("user", user);
+        return "profile/view";
+    }
+    
+    @PostMapping("/update")
+    public String updateProfile(@ModelAttribute User user) {
+        userService.updateUser(user);
+        return "redirect:/profile/view";
+    }
+}
+</code></pre>
+<strong>Purpose:</strong> Handles user profile-related HTTP requests
+
+#### 4. <strong>UserService.java</strong> - User Business Logic
+<pre><code class="language-java">
+@Service
+@Transactional
+public class UserService {
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    
+    public User register(String username, String email, String password, boolean isAdmin) {
+        User user = new User();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        
+        if (isAdmin) {
+            user.getRoles().add(Role.ROLE_ADMIN);
+        } else {
+            user.getRoles().add(Role.ROLE_USER);
+        }
+        
+        return userRepository.save(user);
+    }
+}
+</code></pre>
+<strong>Purpose:</strong> Implements user-related business logic and operations
+
+#### 5. <strong>UserRepository.java</strong> - Data Access Layer
+<pre><code class="language-java">
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByUsername(String username);
+    Optional<User> findByEmail(String email);
+    List<User> findByRolesContaining(Role role);
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
+}
+</code></pre>
+<strong>Purpose:</strong> Provides database access methods for User entity
+
+### <strong>HTML Templates:</strong>
+
+#### 1. <strong>login.html</strong> - Login Page
+<pre><code class="language-html">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login - SLIITFLIX</title>
+    <link href="/css/theme.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <form th:action="@{/login}" method="post">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</body>
+</html>
+</code></pre>
+<strong>Purpose:</strong> User authentication interface
+
+#### 2. <strong>register.html</strong> - Registration Page
+<pre><code class="language-html">
+<form th:action="@{/register}" method="post" th:object="${user}">
+    <input type="text" th:field="*{username}" placeholder="Username" required>
+    <input type="email" th:field="*{email}" placeholder="Email" required>
+    <input type="password" th:field="*{password}" placeholder="Password" required>
+    <input type="checkbox" name="isAdmin"> Make me an admin
+    <button type="submit">Register</button>
+</form>
+</code></pre>
+<strong>Purpose:</strong> New user registration interface
+
+#### 3. <strong>profile/view.html</strong> - User Profile Page
+<pre><code class="language-html">
+<div class="profile-container">
+    <h2>Welcome, <span th:text="${user.username}"></span></h2>
+    <div class="profile-info">
+        <p>Email: <span th:text="${user.email}"></span></p>
+        <p>Member since: <span th:text="${#dates.format(user.createdAt, 'MMM dd, yyyy')}"></span></p>
+    </div>
+    <div class="profile-actions">
+        <a href="/profile/watch-history">Watch History</a>
+        <a href="/profile/preferences">Preferences</a>
+        <a href="/profile/my-uploads">My Uploads</a>
+    </div>
+</div>
+</code></pre>
+<strong>Purpose:</strong> User profile display and navigation
+
+---
+
+## 🔐 Security Implementation
+
+### <strong>SecurityConfig.java</strong> - Security Configuration
+<pre><code class="language-java">
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/admin/<em></em>").hasRole("ADMIN")
+                .requestMatchers("/profile/<em></em>").authenticated()
+                .requestMatchers("/videos/upload").authenticated()
+                .anyRequest().permitAll()
+            )
+            .formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/")
+                .failureUrl("/login?error=true")
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/")
+            )
+            .build();
+    }
+}
+</code></pre>
+
+<strong>Security Features:</strong>
+- <strong>Role-based access:</strong> Admin vs regular user permissions
+- <strong>Protected routes:</strong> Certain pages require authentication
+- <strong>Form-based login:</strong> Custom login page
+- <strong>Session management:</strong> Automatic session handling
+
+---
+
+## 🎯 Key Features Implementation
+
+### 1. <strong>User Management System</strong>
+- <strong>Registration:</strong> New user signup with role assignment
+- <strong>Authentication:</strong> Secure login with password encryption
+- <strong>Profile Management:</strong> User profile viewing and editing
+- <strong>Role-based Access:</strong> Admin and user permission levels
+
+### 2. <strong>Video Content Management</strong>
+- <strong>Upload:</strong> Large file upload support (up to 2GB)
+- <strong>Storage:</strong> Local file system storage in <code>./data/videos/</code>
+- <strong>Metadata:</strong> Video information storage in database
+- <strong>Categories:</strong> Video categorization and tagging
+
+### 3. <strong>Search and Browse</strong>
+- <strong>Title Search:</strong> Full-text search across video titles
+- <strong>Category Filtering:</strong> Browse videos by category
+- <strong>Pagination:</strong> Efficient handling of large video collections
+
+### 4. <strong>User Interaction</strong>
+- <strong>Watch History:</strong> Track user viewing history
+- <strong>Search History:</strong> Remember user search queries
+- <strong>Preferences:</strong> User-specific settings storage
+
+### 5. <strong>Administrative Features</strong>
+- <strong>User Management:</strong> Admin can manage all users
+- <strong>Content Management:</strong> Admin can manage all videos
+- <strong>Dashboard:</strong> Administrative overview and statistics
+
+---
+
+## 🚀 How to Run the Project
+
+### <strong>Prerequisites:</strong>
+1. Java 17 or higher
+2. Maven 3.6+
+3. IDE (IntelliJ IDEA recommended)
+
+### <strong>Setup Steps:</strong>
+1. Extract the project ZIP file
+2. Open in IDE (File → Open → Select project folder)
+3. Wait for Maven dependencies to download
+4. Run <code>VideoBrowseApplication.java</code>
+5. Open browser to <code>http://localhost:8080</code>
+
+### <strong>Default Accounts:</strong>
+- <strong>Admin:</strong> username: <code>admin</code>, password: <code>adminpass</code>
+- <strong>User:</strong> username: <code>user</code>, password: <code>userpass</code>
+
+### <strong>Database Access:</strong>
+- <strong>H2 Console:</strong> <code>http://localhost:8080/h2</code>
+- <strong>URL:</strong> <code>jdbc:h2:file:./data/h2db/videobrowse</code>
+- <strong>Username:</strong> <code>sa</code>
+- <strong>Password:</strong> (leave empty)
+
+---
+
+## 📊 Database Schema
+
+### <strong>Main Tables:</strong>
+- <strong>users:</strong> User accounts and authentication
+- <strong>user_profiles:</strong> Extended user information
+- <strong>videos:</strong> Video metadata and file information
+- <strong>categories:</strong> Video categorization
+- <strong>watch_history:</strong> User viewing history
+- <strong>search_history:</strong> User search queries
+- <strong>support_tickets:</strong> Customer support system
+
+### <strong>Relationships:</strong>
+- User → UserProfile (One-to-One)
+- User → WatchHistory (One-to-Many)
+- User → Videos (One-to-Many, for uploads)
+- Video → Category (Many-to-One)
+
+---
+
+## 🎨 Frontend Technology
+
+### <strong>Thymeleaf Templates:</strong>
+- <strong>Server-side rendering:</strong> HTML templates with dynamic content
+- <strong>Form binding:</strong> Automatic form-to-object mapping
+- <strong>Security integration:</strong> Built-in CSRF protection
+- <strong>Bootstrap styling:</strong> Responsive and modern UI
+
+### <strong>Static Resources:</strong>
+- <strong>CSS:</strong> Custom styling in <code>/static/css/theme.css</code>
+- <strong>JavaScript:</strong> Client-side functionality
+- <strong>Images:</strong> UI icons and graphics
+
+---
+
+## 🔧 Configuration Management
+
+### <strong>Environment Profiles:</strong>
+- <strong>Default:</strong> H2 embedded database (development)
+- <strong>MySQL:</strong> Production database configuration
+- <strong>Properties:</strong> Externalized configuration for different environments
+
+### <strong>File Upload Configuration:</strong>
+- <strong>Maximum file size:</strong> 2GB for video uploads
+- <strong>Storage location:</strong> <code>./data/videos/</code> directory
+- <strong>File validation:</strong> Type and size checking
+
+---
+
+This comprehensive documentation covers all aspects of the VideoBrowse System, from architecture components to implementation details, providing a complete understanding of how a Spring Boot application works and how all the pieces fit together to create a functional video streaming platform.
+</body></html>

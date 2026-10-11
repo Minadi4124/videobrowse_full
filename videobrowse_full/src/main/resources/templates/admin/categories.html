@@ -1,0 +1,60 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <title>Category Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body class="container mt-4">
+<h3>Categories</h3>
+<form class="row g-2" method="post" th:action="@{/admin/categories/main}">
+  <div class="col"><input class="form-control" name="name" placeholder="Main category name" required/></div>
+  <div class="col"><input class="form-control" name="description" placeholder="Description"/></div>
+  <div class="col-auto"><button class="btn btn-primary">Add Main</button></div>
+</form>
+
+<form class="row g-2 mt-2" method="post" th:action="@{/admin/categories/sub}">
+  <div class="col"><input class="form-control" name="name" placeholder="Subcategory name" required/></div>
+  <div class="col"><input class="form-control" name="description" placeholder="Description"/></div>
+  <div class="col">
+    <input class="form-control" name="parentId" placeholder="Parent main category ID" required/>
+  </div>
+  <div class="col-auto"><button class="btn btn-secondary">Add Sub</button></div>
+  </form>
+
+<table class="table table-bordered mt-3">
+  <thead>
+  <tr><th>ID</th><th>Name</th><th>Description</th><th>Type</th><th>Actions</th></tr>
+  </thead>
+  <tbody>
+  <tr th:each="c : ${items}">
+    <td th:text="${c.id}"></td>
+    <td>
+      <form class="d-flex" th:action="@{'/admin/categories/' + ${c.id} + '/update'}" method="post">
+        <input class="form-control" name="name" th:value="${c.name}"/>
+        <input class="form-control ms-2" name="description" th:value="${c.description}"/>
+        <button class="btn btn-sm btn-primary ms-2">Save</button>
+      </form>
+    </td>
+    <td th:text="${c.description}"></td>
+    <td th:text="${#objects.nullSafe(c.getClass().simpleName, 'Category')}"></td>
+    <td>
+      <form th:action="@{'/admin/categories/' + ${c.id} + '/delete'}" method="post" class="d-inline">
+        <button class="btn btn-sm btn-danger">Delete</button>
+      </form>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<h5>Merge Categories</h5>
+<form class="row g-2" th:action="@{/admin/categories/merge}" method="post">
+  <div class="col"><input class="form-control" name="fromId" placeholder="From ID"/></div>
+  <div class="col"><input class="form-control" name="intoId" placeholder="Into ID"/></div>
+  <div class="col-auto"><button class="btn btn-warning">Merge</button></div>
+</form>
+
+</body>
+</html>
+
+

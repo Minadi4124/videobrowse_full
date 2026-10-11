@@ -1,0 +1,65 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="utf-8"/><title>SLIITFLIX - Register</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="/css/theme.css" rel="stylesheet"/></head>
+<body class="bg-light">
+<div class="container mt-5" style="max-width:520px;">
+  <div class="d-flex align-items-center mb-3">
+    <h3 class="mb-0">Create account</h3>
+    <a href="/" class="btn btn-sm btn-outline-secondary ms-auto">Home</a>
+  </div>
+  
+  <!-- General error message -->
+  <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+  
+  <form method="post" th:object="${form}">
+    <div class="mb-3">
+      <label class="form-label">Username <span class="text-danger">*</span></label>
+      <input class="form-control" th:field="*{username}" required/>
+      <div th:if="${#fields.hasErrors('username')}" class="text-danger small" th:errors="*{username}"></div>
+    </div>
+    
+    <div class="mb-3">
+      <label class="form-label">Email <span class="text-danger">*</span></label>
+      <input type="email" class="form-control" th:field="*{email}" required/>
+      <div th:if="${#fields.hasErrors('email')}" class="text-danger small" th:errors="*{email}"></div>
+    </div>
+    
+    <div class="mb-3">
+      <label class="form-label">Password <span class="text-danger">*</span></label>
+      <div class="input-group">
+        <input type="password" class="form-control" th:field="*{password}" required/>
+        <button class="btn btn-outline-secondary" type="button" id="togglePassword" aria-label="Show password">Show</button>
+      </div>
+      <div th:if="${#fields.hasErrors('password')}" class="text-danger small" th:errors="*{password}"></div>
+    </div>
+    
+    <div class="form-check mb-3">
+      <input class="form-check-input" type="checkbox" th:field="*{admin}" id="adminCk">
+      <label class="form-check-label" for="adminCk">Register as admin</label>
+    </div>
+    
+    <button class="btn btn-primary w-100" type="submit">Register</button>
+    
+    <div class="text-center mt-3">
+      <a href="/login" class="text-decoration-none">Already have an account? Login here</a>
+    </div>
+  </form>
+</div>
+<script>
+  (function(){
+    const btn = document.getElementById('togglePassword');
+    if (!btn) return;
+    btn.addEventListener('click', function(){
+      const input = document.querySelector('input[name="password"]');
+      if (!input) return;
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      this.textContent = isHidden ? 'Hide' : 'Show';
+      this.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+    });
+  })();
+  </script>
+</body>
+</html>

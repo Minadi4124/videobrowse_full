@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Preferences</title>
+</head>
+<body>
+<h1>Preferences</h1>
+<form method="post" th:action="@{/profile/preferences}">
+    <textarea name="preferencesJson" rows="10" cols="80" th:text="${profile.preferencesJson}"></textarea>
+    <br/>
+    <button type="submit">Save</button>
+    <a th:href="@{/profile}">Back</a>
+    </form>
+</body>
+</html>
+
+
